@@ -1,0 +1,80 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAXV = 510;  //最大顶点数
+const int INF = 1000000000;  //无穷大
+//n为顶点数，m为边数，st和ed分别为起点和终点
+//G为距离矩阵，cost为花费矩阵，d[]记录最短距离,c[]记录最小花费
+int n,m,st,ed,G[MAXV][MAXV],cost[MAXV][MAXV];
+int d[MAXV],c[MAXV],pre[MAXV];   //pre[]记录前驱结点
+bool vis[MAXV]={false};  //vis[i]==true 表示顶点i已访问，初值均为false
+
+void Dijkstra(int s){
+    //s为起点
+    fill(d,d+MAXV,INF);  //fill函数将整个d数组赋为INF
+    fill(c, c+MAXV, INF);
+    for (int i=0; i<n; i++) {
+        pre[i] = i;
+    }
+    d[s] = 0;  // 起点s到达自身的距离为0
+    c[s] = 0;  //起点s到达自身的花费为0
+    for (int i=0; i<n; i++) {
+        int u=-1,MIN = INF;  //u使得d[u]最小，MIN存放该最小的d[u]
+        for (int j=0; j<n; j++) {
+            if (vis[j]==false && d[j]<MIN) {
+                //找到未访问的顶点中d[]最小的
+                u = j;
+                MIN = d[j];
+            }
+        }
+        //找不到小于INF的d[u],说明剩下的顶点和起点不连通
+        if (u==-1) {
+            return;
+        }
+        vis[u] = true;  //标记u为已访问
+        for (int v=0; v<n; v++) {
+            //如果v未访问，且u能到达v
+            if(vis[v]==false && G[u][v]!=INF){
+                if (d[u]+G[u][v]<d[v]) {
+                    //以u为中介点能令d[v]变小
+                    d[v] = d[u] + G[u][v];  //优化d[v]
+                    c[v] = c[u] + cost[u][v];  //优化c[v]
+                    pre[v] = u;  //令v的前驱为u
+                }
+                else if(d[u]+G[u][v]==d[v]){
+                    //找到一条相同长度的路径
+                    if (c[u]+cost[u][v]<c[v]) {
+                        // 以u为中介点时c[v]更小
+                        c[v] = c[u] + cost[u][v];  //优化c[v]
+                        pre[v] = u;
+                    }
+                }
+            }
+        }
+    }
+}
+void DFS(int v){
+    //打印路径
+    if(v==st){
+        printf("%d ",v);
+        return;
+    }
+    DFS(pre[v]);
+    printf("%d ",v);
+}
+int main(){
+    scanf("%d%d%d%d",&n,&m,&st,&ed);  //输入顶点数，边数，起点，终点
+    int a,b;
+    fill(G[0], G[0]+MAXV*MAXV, INF);  //    初始化图G
+    for(int i=0;i<m;i++){
+        scanf("%d%d",&a,&b);  //输入两个结点
+        scanf("%d%d",&G[a][b],&cost[a][b]);  //输入
+        G[b][a] = G[a][b];
+        cost[b][a] = cost[a][b];
+    }
+    Dijkstra(st);  //算法入口
+    DFS(ed);  //打印路径
+    printf("%d %d\n",d[ed],c[ed]);  //最短距离，最短路径下的花费
+    return 0;
+}
