@@ -1,0 +1,74 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <set>
+#include <algorithm>
+using namespace std;
+const int MAXV = 510;  //最大顶点数
+const int INF = 0x3fffffff;  //无穷大
+struct Node{
+    int v,dis;  //v为邻接边的目标结点，dis为邻接边的边权
+    Node(int _v,int _dis):v(_v),dis(_dis){}  //构造函数
+};
+vector<Node> Adj[MAXV];  //图G的邻接表
+//n为顶点数，m为边数，st和ed分别为起点和终点，weight[]记录点权
+int n,m,st,ed,weight[MAXV];
+//d[]记录最短距离，w[]记录最大点权之和，num[]记录最短路径条数
+int d[MAXV],w[MAXV],num[MAXV];
+set<int> pre[MAXV];  //前驱，当遇到一条和已有最短路径长度相同的路径时，必须重新计算最短路径条数
+
+void Bellman(int s){
+    //s为源点
+    fill(d, d+MAXV, INF);
+    memset(num, 0, sizeof(num));
+    memset(w, 0, sizeof(w));
+    d[s]=0;
+    w[s]=weight[s];
+    num[s] = 1;
+    //求解数组d
+    for (int i=0; i<n-1; i++) {
+        //n为顶点数,执行n-1轮操作
+        for (int u=0; u<n; u++) {
+            //每轮操作都遍历所有边
+            for (int j=0; j<Adj[u].size(); j++) {
+                int v = Adj[u][j].v; //邻接边的顶点
+                int dis = Adj[u][j].dis;  //邻接边的边权
+                if(d[u]+dis<d[v]){ //若以u为中介点时能令d[v]变小
+                    d[v] = d[u] + dis;  //覆盖d[v]
+                    w[v] = w[u] + weight[v];  //覆盖w[v]
+                    num[v] = num[u];  //覆盖num[v]
+                    pre[v].clear();
+                    pre[v].insert(u);
+                }
+                else if (d[u]+dis==d[v]){
+                    //找到一条相同长度的路径
+                    if (w[u]+weight[v]>w[v]) {
+                        //以u为中介点时点权之和更大
+                        w[v] = w[u] + weight[v];  //w[v]继承自w[u]
+                    }
+                    pre[v].insert(u);  //将u加入pre[v]
+                    num[v] = 0;  //重新统计num[v]
+                    set<int>::iterator it;
+                    for(it=pre[v].begin(); it!=pre[v].end(); it++) {
+                        num[v] +=num[*it];
+                    }
+                }
+            }
+        }
+    }
+}
+int main(){
+    scanf("%d%d%d%d",&n,&m,&st,&ed);
+    for (int i=0; i<n; i++) {
+        scanf("%d",&weight[i]);  //读入点权
+    }
+    int u,v,wt;
+    for (int i=0; i<m; i++) {
+        scanf("%d%d%d",&u,&v,&wt);  //输入边权
+        Adj[u].push_back(Node(v,wt));
+        Adj[v].push_back(Node(u,wt));
+    }
+    Bellman(st);
+    printf("%d %d\n",num[ed],w[ed]);  //最短距离条数，最短路径中的最大点权
+    return 0;
+}
