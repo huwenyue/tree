@@ -28,7 +28,7 @@ void Bellman(int s){
     //求解数组d
     for (int i=0; i<n-1; i++) {
         //n为顶点数,执行n-1轮操作
-        for (int u=0; u<n; u++) {
+        for (int u=0; u<m; u++) {
             //每轮操作都遍历所有边
             for (int j=0; j<Adj[u].size(); j++) {
                 int v = Adj[u][j].v; //邻接边的顶点
