@@ -1,0 +1,23 @@
+//找出给定字符串中第一个不重复的字符，哈希表实现
+#include <iostream>
+#include <map>
+#include <algorithm>
+#include <list>
+using namespace std;
+char findfirstch(string str){
+    char store[256] = {0};  //Ascll码表的个数
+    for(int i=0;i<str.size();i++){
+        store[str[i]] ++;
+    }
+    for(int i=0;i<str.size();i++){
+        if(store[str[i]]==1) return str[i];   //如果判断store[i]会以字典序输出,但要以str内字母的先后输出
+    }
+    return -1;
+}
+int main(){
+    string s = "bbccda";
+    char ch = findfirstch(s);
+    if(ch!=1) cout<<ch<<endl;
+    else cout<<"not match character"<<endl;
+    return 0;
+}
