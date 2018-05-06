@@ -1,0 +1,45 @@
+//输入：邻接表，输出：邻接矩阵
+/* 
+4
+1 2 2 4
+2 1 4
+3 0
+4 1 3
+
+0 1 0 1
+0 0 0 1
+0 0 0 0 
+0 0 1 0
+*/
+
+#include <iostream>
+using namespace std;
+static const int n = 100;
+
+int main(){
+    int m[n][n];   //邻接矩阵用二维数组表示
+    int n,u,k,v;  //顶点个数,顶点编号，度，与u相邻的顶点编号v
+    cin>>n;
+    for (int i=0; i<n; i++) {
+        for(int j=0;j<n;j++){
+            m[i][j] = 0;   //  初始化邻接矩阵
+        }
+    }
+    for (int i=0; i<n; i++) {
+        cin>>u>>k;  //输入顶点编号和相连边的条数
+        u--;   //将编号转换为从0开始
+        for(int j=0;j<k;j++){
+            cin>>v;
+            v--;   //将编号转换为从0开始
+            m[u][v] = 1;   //u,v间画出一条边
+        }
+    }
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<n; j++) {
+            if(j) cout<<" ";
+            cout<<m[i][j];
+        }
+        cout<<endl;
+    }
+    return 0;
+}
